@@ -5,7 +5,8 @@ var sys = require('sys'),
 	app = express();
 	
 db.on('error', console.error.bind(console, 'connection_error:'));
-app.listen(39973);
+var port = process.env.PORT || 3000;
+app.listen(port);
 
 var Application = mongoose.Schema({
 

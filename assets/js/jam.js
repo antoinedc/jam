@@ -26,8 +26,6 @@ var Application = function(application) {
 	self.get_state = function() { return self.state(); };
 };
 
-var BASE_URL = 'http://localhost:3000/';
-
 var ApplicationsModel = function(applications) {
 
 	var self = this;
@@ -50,7 +48,7 @@ var ApplicationsModel = function(applications) {
 	self.startNew = function() {
 		
 		var id = uniqId();
-		$.getJSON(BASE_URL + 'new/' + id, function(data) {
+		$.getJSON('/new/' + id, function(data) {
 		
 			location.hash = id;
 		});
@@ -94,7 +92,7 @@ var ApplicationsModel = function(applications) {
 	self.save = function() {
 	
 		$.ajax({
-			url: BASE_URL + 'edit', 
+			url: '/edit', 
 			type: 'POST',
 			dataType: 'json',
 			data: ko.toJSON({id: self.isUserDefined(), applications: self.applications}), 
