@@ -7,6 +7,7 @@ var sys = require('sys'),
 db.on('error', console.error.bind(console, 'connection_error:'));
 var port = process.env.PORT || 3000;
 app.listen(port);
+sys.puts('Running on port ' + port);
 
 var Application = mongoose.Schema({
 
@@ -14,7 +15,7 @@ var Application = mongoose.Schema({
 	company: String,
 	mail: String,
 	content: String,
-	state: Number
+	state: String
 });	
 
 var Applicant = mongoose.Schema({
@@ -92,7 +93,7 @@ db.once('open', function() {
 		var id = req.body.id;
 		var applications = req.body.applications;
 		
-		User.findOne({'_id': id}, function(err, user) {
+		User.findOne({'id': id}, function(err, user) {
 		
 			if (err){
 			
@@ -102,14 +103,13 @@ db.once('open', function() {
 			}
 		});
 		
-		console.log(applications);
 		var toDestroy = [];
 		var toUpdate = [];
 		for (i in applications)
 			if (!applications[i]._destroy)
 				toUpdate.push(applications[i]);
 
-		User.update({'_id': id}, {applications: toUpdate}, function(err, numberAffected, raw) {
+		User.update({'id': id}, {applications: toUpdate}, function(err, numberAffected, raw) {
 		
 			if (err) {
 			

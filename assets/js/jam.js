@@ -22,7 +22,7 @@ var Application = function(application) {
 	self.company = ko.observable(application.company);
 	self.state = ko.observable(application.state);
 	
-	self.set_state = function(index) { self.state(index); };
+	self.set_state = function(state) { self.state(state); };
 	self.get_state = function() { return self.state(); };
 };
 
@@ -30,7 +30,7 @@ var ApplicationsModel = function(applications) {
 
 	var self = this;
 	
-	self.states = ['Waiting for answer', 'In progress', 'Declined', 'Hired !'];
+	self.states = ['Waiting for answer', 'In progress', 'Declined', 'Hired'];
 	
 	self.chosenApplicationData = ko.observable();
 
@@ -59,10 +59,10 @@ var ApplicationsModel = function(applications) {
 		this.get('#:appId', function() {
 		
 			self.isUserDefined(this.params.appId);
-			$.getJSON(BASE_URL + this.params.appId, function(data) {
+			$.getJSON('/' + this.params.appId, function(data) {
 				
 				console.log(data);
-				self.isUserDefined(data._id);
+				self.isUserDefined(data.id);
 				var mappedApplications = $.map(data.applications, function(application) { return new Application(application) });
 				self.applications(mappedApplications);
 			});
@@ -82,7 +82,7 @@ var ApplicationsModel = function(applications) {
 			mail: 'jobs@company.com',
 			company: 'Company',
 			content: 'My cover letter',
-			state: 0
+			state: 'Waiting for answer'
 		});
 		
 		self.applications.push(newApp);
@@ -110,58 +110,67 @@ var ApplicationsModel = function(applications) {
 		});
 	};
 	
-	self.is_state_filter_checked = ko.computed(function() {
-		console.log(self.filter_wait() || self.filter_progress() || self.filter_declined() || self.filter_hired());
-		return self.filter_wait() || self.filter_progress() || self.filter_declined() || self.filter_hired();
-	});	
+	self.state_filter_flags = ko.observableArray([]);
 	
 	self.filteredApps = ko.computed(function() {
 	
 		var filter_name = self.filter_name().toLowerCase();
 		var filter_email = self.filter_email().toLowerCase();
+		var state_index = {};
+		var checked = false;
 		
-		if (!filter_name && !filter_email && !self.is_state_filter_checked()) {
+		ko.utils.arrayForEach(self.state_filter_flags(), function(flag) {
+			
+			checked = true;
+			state_index[flag] = true;
+		});
+		
+		if (!filter_name && !filter_email && !checked) {
 			
 			return self.applications();
 		}
 		else {
 		
-			return ko.utils.arrayFilter(self.applications(), function(application) {
-				
-				if (application.state() == 0 && self.filter_wait()) return true;
-				if (application.state() == 1 && self.filter_progress()) return true;
-				if (application.state() == 2 && self.filter_declined()) return true;
-				if (application.state() == 3 && self.filter_hired()) return true;
+			var textFilters = ko.utils.arrayFilter(self.applications(), function(application) {
 				
 				if (filter_name && filter_email)
 					return (ko.utils.stringStartsWith(application.mail().toLowerCase(), filter_email)
 							&& ko.utils.stringStartsWith(application.company().toLowerCase(), filter_name));
 				else if (filter_name && !filter_email)
-					return ko.utils.stringStartsWith(application.company().toLowerCase(), filter_name);
+					return (ko.utils.stringStartsWith(application.company().toLowerCase(), filter_name));
 				else if (!filter_name && filter_email)
-					return ko.utils.stringStartsWith(application.mail().toLowerCase(), filter_email);
+					return (ko.utils.stringStartsWith(application.mail().toLowerCase(), filter_email));
+				else
+					return true;
+			});
+			
+			if (!checked) return textFilters;
+			
+			return ko.utils.arrayFilter(textFilters, function(application) {
+				
+				return state_index[application.state()] === true;
 			});
 		}
 	});
-	
+
 	self.waitingForAnswer = ko.computed(function() {
 		
-		return ko.utils.arrayFilter(self.applications(), function(application) { return application.state() === 0 && !application._destroy });
+		return ko.utils.arrayFilter(self.applications(), function(application) { return application.state() === 'Waiting for answer' && !application._destroy });
 	});
 	
 	self.inProgress = ko.computed(function() {
 	
-		return ko.utils.arrayFilter(self.applications(), function(application) { return application.state() === 1 && !application._destroy });
+		return ko.utils.arrayFilter(self.applications(), function(application) { return application.state() === 'In progress' && !application._destroy });
 	});
 	
 	self.closed = ko.computed(function() {
 	
-		return ko.utils.arrayFilter(self.applications(), function(application) { return application.state() === 2 && !application._destroy });
+		return ko.utils.arrayFilter(self.applications(), function(application) { return application.state() === 'Declined' && !application._destroy });
 	});
 	
 	self.hired = ko.computed(function() {
 	
-		return ko.utils.arrayFilter(self.applications(), function(application) { return application.state() === 3 && !application._destroy });
+		return ko.utils.arrayFilter(self.applications(), function(application) { return application.state() === 'Hired' && !application._destroy });
 	});
 	
 	self.chooseApplication = function(application) {

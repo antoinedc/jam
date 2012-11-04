@@ -17,6 +17,11 @@
 	  .current-state {
 		text-decoration: underline;
 	  }
+	  #applicationStates > li {
+		
+		margin-left: 25px;
+		float: left;
+	  }
     </style>
     <link href="./assets/css/bootstrap-responsive.css" rel="stylesheet">
 
@@ -70,7 +75,7 @@
 				<hr />
 			</div>
 			
-			<div id="manager" class="span9">
+			<div id="manager" class="span12">
 				
 				<div id="applicationsFilter" class="span2">
 					<h5>Filters</h5>
@@ -82,16 +87,16 @@
 							<td><input type="text" data-bind="value: filter_name, valueUpdate: 'afterkeydown'" class="input-small" id="name_filter" placeholder="Company name" /></td>
 						</tr>
 						<tr>
-							<td><input type="checkbox" data-bind="value: filter_wait" id="filter_state_0" />&nbsp;Waiting for answer</td>
+							<td><input type="checkbox" value="Waiting for answer" data-bind="checked: state_filter_flags" id="filter_state_0" />&nbsp;Waiting for answer</td>
 						</tr>						
 						<tr>
-							<td><input type="checkbox" data-bind="value: filter_progress" id="filter_state_1" />&nbsp;In progress</td>
+							<td><input type="checkbox" value="In progress" data-bind="checked: state_filter_flags"  />&nbsp;In progress</td>
 						</tr>
 						<tr>
-							<td><input type="checkbox" data-bind="value: filter_declined" id="filter_tate_2" />&nbsp;Declined</td>
+							<td><input type="checkbox" value="Declined" data-bind="checked: state_filter_flags" id="filter_tate_2" />&nbsp;Declined</td>
 						</tr>
 						<tr>
-							<td><input type="checkbox" data-bind="value: filter_hired" id="filter_state_3" />&nbsp;Hired</td>
+							<td><input type="checkbox" value="Hired" data-bind="checked: state_filter_flags" id="filter_state_3" />&nbsp;Hired</td>
 						</tr>
 					</table>
 				</div>
@@ -106,21 +111,22 @@
 						<!-- /ko -->
 						<li><a href="#" data-bind="click: $root.addApplication">Add new</a></li>
 					</ul>
-					<button data-bind="click: save">Save everything</button>
+					<button class="btn btn-info" data-bind="click: save">Save changes</button>
 				</div>
 				
-				<div id="viewApplication" class="span3" data-bind="with: chosenApplicationData">
+				<div id="viewApplication" class="span6" data-bind="with: chosenApplicationData">
 					
 					Email: <input type="text" data-bind="value: mail" /><br />
 					Company: <input type="text" data-bind="value: company" /><br />
 					Cover letter:<br />
-					<textarea cols="10" rows="10" data-bind="html: content"></textarea>
+					<textarea  rows="32" class="span6" data-bind="value: content"></textarea>
 					
 					<ul id="applicationStates">
+						Status:<br />
 						<!-- ko foreach: $root.states -->
 						<li><a href="#" data-bind=" text: $data, 
-													css: { 'current-state': $data == $root.states[$parent.get_state()] },
-													click: $parent.set_state.bind(null, $index())"></a></li>
+													css: { 'current-state': $data == $parent.get_state() },
+													click: $parent.set_state.bind(null, $data)"></a></li>
 						<!-- /ko -->
 					</ul>
 				</div>
