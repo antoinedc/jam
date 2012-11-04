@@ -2,7 +2,7 @@ var sys = require('sys'),
 	express = require('express'),
 	mongoose= require('mongoose'),
 	credentials = require('./credentials'),
-	db = mongoose.createConnection(process.env.MONGOLAB_URI || credentials.mongolabUri),
+	db = mongoose.createConnection(credentials.mongolabUri),
 	app = express();
 
 var port = process.env.PORT || 3000;
