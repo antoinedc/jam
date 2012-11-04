@@ -4,7 +4,10 @@ var sys = require('sys'),
 	db = mongoose.createConnection('localhost', 'jam'),
 	app = express();
 	
-db.on('error', console.error.bind(console, 'connection_error:'));
+db.on('error', function() {
+
+	app.send('Error while connecting to the database');
+});
 var port = process.env.PORT || 3000;
 app.listen(port);
 sys.puts('Running on port ' + port);
