@@ -3,13 +3,16 @@ var sys = require('sys'),
 	mongoose= require('mongoose'),
 	db = mongoose.createConnection('localhost', 'jam'),
 	app = express();
-	
-db.on('error', function() {
 
-	app.send('Error while connecting to the database');
-});
 var port = process.env.PORT || 3000;
 app.listen(port);
+
+db.on('error', function() {
+	app.get('/', function(req, res){
+		res.send('Error while connnecting to the database');
+	});
+});
+
 sys.puts('Running on port ' + port);
 
 var Application = mongoose.Schema({
